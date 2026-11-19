@@ -142,20 +142,21 @@ static int padlock_init(ENGINE *e)
     return (padlock_use_rng || padlock_use_ace);
 }
 
-#ifndef AES_ASM
+/* Keep key expansion compatible with padlock_key_bswap in static builds too. */
 static int padlock_aes_set_encrypt_key(const unsigned char *userKey,
     const int bits,
     AES_KEY *key);
 static int padlock_aes_set_decrypt_key(const unsigned char *userKey,
     const int bits,
     AES_KEY *key);
+#ifndef AES_ASM
 #define AES_ASM
+#endif
 #define AES_set_encrypt_key padlock_aes_set_encrypt_key
 #define AES_set_decrypt_key padlock_aes_set_decrypt_key
 /* clang-format off */
 #   include "../crypto/aes/aes_core.c"
 /* clang-format on */
-#endif
 
 /*
  * This stuff is needed if this ENGINE is being compiled into a
